@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Watching for file changes with Python</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Watching for file changes with Python</h2>
+
+    <div class="post-info">
+        2019-09-01
+    </div>
+
+    <div class="entry-content">
+        <p>Working on <a href="https://github.com/picofish/generatore">Generatore</a> I wanted to be able to quickly rebuild the website when new changes were introduced to my posts.</p>
+<p>If you need to implement something like that, you need <a href="https://pythonhosted.org/watchdog/">Watchdog</a>.</p>
+<p>Quoting from my project, you'll need to implement a custom handler inheriting from <code>FileSystemEventHandler</code>:</p>
+<pre class="language-python"><code class="language-python"><span class="token keyword">import</span> os<br><br><span class="token keyword">from</span> watchdog<span class="token punctuation">.</span>events <span class="token keyword">import</span> FileSystemEventHandler<br><span class="token keyword">from</span> watchdog<span class="token punctuation">.</span>observers <span class="token keyword">import</span> Observer<br><br><span class="token keyword">class</span> <span class="token class-name">ContentHandler</span><span class="token punctuation">(</span>FileSystemEventHandler<span class="token punctuation">)</span><span class="token punctuation">:</span><br>    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> site<span class="token punctuation">)</span><span class="token punctuation">:</span><br>        self<span class="token punctuation">.</span>site <span class="token operator">=</span> site<br>    <span class="token keyword">def</span> <span class="token function">on_modified</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">:</span><br>        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f'</span><span class="token interpolation"><span class="token punctuation">{</span>event<span class="token punctuation">.</span>src_path<span class="token punctuation">}</span></span><span class="token string"> has been </span><span class="token interpolation"><span class="token punctuation">{</span>event<span class="token punctuation">.</span>event_type<span class="token punctuation">}</span></span><span class="token string">'</span></span><span class="token punctuation">)</span><br>        self<span class="token punctuation">.</span>site<span class="token punctuation">.</span>build_site<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>With <code>self.site.build_site()</code> being the function that you need to call when files are modified.</p>
+<p>The code for the observer will be something like this:</p>
+<pre class="language-python"><code class="language-python">content_handler <span class="token operator">=</span> ContentHandler<span class="token punctuation">(</span>SiteBuilder<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><br>observer <span class="token operator">=</span> Observer<span class="token punctuation">(</span><span class="token punctuation">)</span><br>observer<span class="token punctuation">.</span>schedule<span class="token punctuation">(</span>content_handler<span class="token punctuation">,</span> path<span class="token operator">=</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>os<span class="token punctuation">.</span>getcwd<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'content'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> recursive<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><br>observer<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span><br><br><span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Listening for changes...'</span><span class="token punctuation">)</span><br><br><span class="token keyword">try</span><span class="token punctuation">:</span><br>    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span><br>        time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><br><span class="token keyword">except</span> KeyboardInterrupt<span class="token punctuation">:</span><br>    observer<span class="token punctuation">.</span>stop<span class="token punctuation">(</span><span class="token punctuation">)</span><br>observer<span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>Having <code>path</code> set to <code>./content/</code>, the observer will watch for changes in that directory, recursivly, because of <code>recursive=True</code>.</p>
+<p>That's it!</p>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

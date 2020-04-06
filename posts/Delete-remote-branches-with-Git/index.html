@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Delete remote branches with Git</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Delete remote branches with Git</h2>
+
+    <div class="post-info">
+        2019-08-29
+    </div>
+
+    <div class="entry-content">
+        <p>When trying to implement some new feature, <em>most</em> of the times I create a new branch. This usually results in a huge pile of old branches that might or might have not been synced to Github.</p>
+<p>If you need to clean these branches out, the easiest way to do it is to delete them from Github through Git on the CLI.</p>
+<p>Run this:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">git</span> push origin --delete stuff-merged-to-master</code></pre>
+<p>Note that the local branch will not get deleted. In order to delete the local branch you'll have to issue:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">git</span> branch -d stuff-merged-to-master</code></pre>
+<p>That's it!</p>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

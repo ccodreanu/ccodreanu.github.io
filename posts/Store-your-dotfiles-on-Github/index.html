@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Store your dotfiles on Github</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Store your dotfiles on Github</h2>
+
+    <div class="post-info">
+        2019-08-21
+    </div>
+
+    <div class="entry-content">
+        <p>Moving to a new system is almost always painful to deal with. From time to time, when I have to reinstall my system, I end up googling for this HN <a href="https://news.ycombinator.com/item?id=11070797">discussion</a>.</p>
+<p>So what I do, is saving my dotfiles from my home directory on a Github repository. This works great if you use the detached <code>.git</code> directory. Run the following:</p>
+<p>Run <code>git init --bare $HOME/.myconf</code> to create your empty repository.
+Add an alias to your <code>.profile</code> configuration:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token builtin class-name">alias</span> <span class="token assign-left variable">config</span><span class="token operator">=</span><span class="token string">'/usr/bin/git --git-dir=<span class="token environment constant">$HOME</span>/.myconf/ --work-tree=<span class="token environment constant">$HOME</span>'</span></code></pre>
+<p>Finally, run: <code>config config status.showUntrackedFiles no</code> so you don't see all of your files in the working directory as untracked.</p>
+<p>Running a <code>config status</code> will show you what dotfiles have been modified and are ready to be commited. Adding files to your git repository is done with <code>config add ~/path/to/file</code>, <code>config commit</code> and <code>config push</code>.</p>
+<p>Restoring the files from Github is a matter of cloning and manually moving your files into place.
+So you run:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">git</span> clone --separate-git-dir<span class="token operator">=</span><span class="token environment constant">$HOME</span>/.myconf /path/to/repo <span class="token environment constant">$HOME</span>/myconf-tmp</code></pre>
+<p>And then copy or move the files from <code>~/myconf-tmp</code> to <code>.vimrc</code>, <code>.gitconfig</code> and so on.</p>
+<p>Done!</p>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Run Kubernetes on a virtual machine</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Run Kubernetes on a virtual machine</h2>
+
+    <div class="post-info">
+        2019-09-10
+    </div>
+
+    <div class="entry-content">
+        <p>If you need a scratch Kubernetes cluster where you can test deployments and such you can follow this short guide to get a single node Kubernetes.</p>
+<p>I'm using WSL with Ubuntu 18.04 so the information here is somehow related to my configuration.</p>
+<p>Start by installing Ansible on your machine:</p>
+<pre class="language-shell"><code class="language-shell">pip3 <span class="token function">install</span> ansible</code></pre>
+<p>Once that is completed, we'll be using these two roles from Ansible Galaxy: <a href="https://galaxy.ansible.com/geerlingguy/docker">Docker</a> and <a href="https://galaxy.ansible.com/geerlingguy/kubernetes">Kubernetes</a>.</p>
+<p>Install them with the following command:</p>
+<pre class="language-shell"><code class="language-shell">ansible-galaxy <span class="token function">install</span> geerlingguy.docker geerlingguy.kubernetes</code></pre>
+<p>This will put those two roles inside <code>~/.ansible/roles</code> and you will be able to use them in all of your playbooks.</p>
+<p>As for the target host where Kubernetes is going to be deployed, I'm using Ubuntu 18.04 in a Virtualbox VM running thourgh Vagrant. Execute <code>sudo apt install virtualbox vagrant</code> to install them both.</p>
+<p>To run the VM you can use this <code>Vagrantfile</code> and run <code>vagrant up</code> in the directory containing the file:</p>
+<pre class="language-ruby"><code class="language-ruby"><span class="token constant">Vagrant</span><span class="token punctuation">.</span>configure<span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span> <span class="token keyword">do</span> <span class="token operator">|</span>config<span class="token operator">|</span><br>  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>box <span class="token operator">=</span> <span class="token string">"ubuntu/bionic64"</span><br><br>  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"private_network"</span><span class="token punctuation">,</span> ip<span class="token punctuation">:</span> <span class="token string">"192.168.33.10"</span><br>  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>network <span class="token string">"public_network"</span><br><br>  config<span class="token punctuation">.</span>vm<span class="token punctuation">.</span>provider <span class="token string">"virtualbox"</span> <span class="token keyword">do</span> <span class="token operator">|</span>vb<span class="token operator">|</span><br>    vb<span class="token punctuation">.</span>memory <span class="token operator">=</span> <span class="token string">"2048"</span><br>  <span class="token keyword">end</span><br><span class="token keyword">end</span></code></pre>
+<p>I also like to create my own user on the VM with <code>sudo adduser USERNAME</code>, put my SSH public key in <code>~/.ssh/authorized_keys</code> and add the user to <code>/etc/sudoers</code> with <code>sudo visudo</code>.</p>
+<p>After you're done with the above, create a simple inventory file for Ansible and a small playbook like this one:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token punctuation">---</span><br><span class="token punctuation">-</span> <span class="token key atrule">hosts</span><span class="token punctuation">:</span> all<br><br>  <span class="token key atrule">vars</span><span class="token punctuation">:</span><br>    <span class="token key atrule">kubernetes_allow_pods_on_master</span><span class="token punctuation">:</span> <span class="token boolean important">true</span><br><br>  <span class="token key atrule">roles</span><span class="token punctuation">:</span><br>    <span class="token punctuation">-</span> geerlingguy.docker<br>    <span class="token punctuation">-</span> geerlingguy.kubernetes</code></pre>
+<p>Run the playbook with:</p>
+<pre class="language-shell"><code class="language-shell">ansible-playbook -i k8s.ini k8s.yml --become --ask-become-pass -u USERNAME</code></pre>
+<p>I needed <code>python</code> on my system before running the playbook, so it might be useful to run <code>sudo apt install python</code> first.</p>
+<p>Once that is done you can login on the Kubernetes node and use <code>kubectl</code>.</p>
+<p>You can also copy the file <code>/etc/kubernetes/admin.conf</code> to your dev machine if you want to manage remote clusters with <code>kubectl</code>. This <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">article</a> can help you create a <code>kubectl</code> configuration file with multiple clusters, contexts and users.</p>
+<hr>
+<p>References:</p>
+<ul>
+<li><a href="https://github.com/geerlingguy/ansible-role-kubernetes">https://github.com/geerlingguy/ansible-role-kubernetes</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/</a></li>
+</ul>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

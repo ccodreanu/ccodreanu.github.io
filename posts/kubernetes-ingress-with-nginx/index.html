@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kubernetes Ingress with NGINX</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Kubernetes Ingress with NGINX</h2>
+
+    <div class="post-info">
+        2019-09-11
+    </div>
+
+    <div class="entry-content">
+        <p>I've updated my <a href="https://github.com/picofish/k8s-vagrant">Git repository</a> with an NGINX proxy role. The role installs NGINX on the Kubernetes cluster, but a dedicated VM can do as well. This NGINX will proxy requests to the Kubernetes Ingress in our cluster.</p>
+<p>The proxy configuration is as simple as:</p>
+<pre class="language-nginx"><code class="language-nginx"><span class="token keyword">upstream</span> cluster <span class="token punctuation">{</span><br>  <span class="token keyword">server</span> <span class="token number">192.168</span><span class="token number">.178</span><span class="token number">.15</span><span class="token punctuation">:</span><span class="token number">30000</span><span class="token punctuation">;</span><br><span class="token punctuation">}</span><br><br><span class="token keyword">server</span> <span class="token punctuation">{</span><br>  <span class="token keyword">listen</span> <span class="token number">80</span><span class="token punctuation">;</span><br>  <span class="token keyword">listen</span> <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">;</span><br><br>  <span class="token keyword">server_name</span> kubernetes<span class="token punctuation">;</span><br><br>  <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span><br>    <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$host</span><span class="token punctuation">;</span><br>    <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>cluster<span class="token operator">/</span><span class="token punctuation">;</span><br>    <span class="token keyword">proxy_pass_request_headers</span> on<span class="token punctuation">;</span><br>  <span class="token punctuation">}</span><br><span class="token punctuation">}</span></code></pre>
+<p>The <a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Kubernetes Ingress resource</a> is something that can manipulate traffic going to your cluster. Basically, the Ingress resource is the configuration of yet another proxy in front of Kubernetes, which can also expose services without using <code>kubectl port-forward</code>.</p>
+<p>Your cluster needs something that's called Ingress controller, which is something that in our case will translate to yet another proxy. This ingress controller is in charge of sending the traffic to the correct K8s service. This is different than the proxy deployed with the role mentioned above; that one moves traffic from &quot;outside&quot; inside your cluster.</p>
+<p>For this exercise I'm using <a href="https://kubernetes.github.io/ingress-nginx/">NGINX</a> as a controller, the one maintained by the Kubernetes project.</p>
+<p>To deploy the controller you need to run this:</p>
+<pre class="language-shell"><code class="language-shell">kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml</code></pre>
+<p>The above command will deploy the controller and its dependencies. The controller, however, needs to be reached from outside the internal network of Kubernetes. To do that, I use the <code>NodePort</code> service type.</p>
+<p>Run this:</p>
+<pre class="language-yaml"><code class="language-yaml"><span class="token punctuation">---</span><br><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1<br><span class="token key atrule">kind</span><span class="token punctuation">:</span> Service<br><span class="token key atrule">metadata</span><span class="token punctuation">:</span><br>  <span class="token key atrule">name</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx<br>  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx<br>  <span class="token key atrule">labels</span><span class="token punctuation">:</span><br>    <span class="token key atrule">app.kubernetes.io/name</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx<br>    <span class="token key atrule">app.kubernetes.io/part-of</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx<br><span class="token key atrule">spec</span><span class="token punctuation">:</span><br>  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort<br>  <span class="token key atrule">ports</span><span class="token punctuation">:</span><br>    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> http<br>      <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">30000</span><br>      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">80</span><br>      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> <span class="token number">80</span><br>      <span class="token key atrule">protocol</span><span class="token punctuation">:</span> TCP<br>    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> https<br>      <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">30001</span><br>      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">443</span><br>      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> <span class="token number">443</span><br>      <span class="token key atrule">protocol</span><span class="token punctuation">:</span> TCP<br>  <span class="token key atrule">selector</span><span class="token punctuation">:</span><br>    <span class="token key atrule">app.kubernetes.io/name</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx<br>    <span class="token key atrule">app.kubernetes.io/part-of</span><span class="token punctuation">:</span> ingress<span class="token punctuation">-</span>nginx</code></pre>
+<p>After this command you should be able to see ports 30000 and 30001 listening on the master node. Run a <code>netstat -tulpn</code> to be sure.</p>
+<p>Now, the Ansible role comes into play. The role will send traffic coming on port 80 to port 30000 in the cluster.</p>
+<p>So in order to test an ingress, run the following:</p>
+<ul>
+<li>Create a dummy web app:</li>
+</ul>
+<pre class="language-shell"><code class="language-shell">kubectl apply -f https://k8s.io/examples/application/deployment.yaml</code></pre>
+<ul>
+<li>Expose this deployment through a service:</li>
+</ul>
+<pre class="language-shell"><code class="language-shell">kubectl expose deployment nginx-deployment</code></pre>
+<ul>
+<li>Create the ingress:</li>
+</ul>
+<pre class="language-yaml"><code class="language-yaml"><span class="token punctuation">---</span><br><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> extensions/v1beta1<br><span class="token key atrule">kind</span><span class="token punctuation">:</span> Ingress<br><span class="token key atrule">metadata</span><span class="token punctuation">:</span><br>  <span class="token key atrule">name</span><span class="token punctuation">:</span> nginx<span class="token punctuation">-</span>deployment<span class="token punctuation">-</span>ingress<br>  <span class="token key atrule">annotations</span><span class="token punctuation">:</span><br>    <span class="token key atrule">kubernetes.io/ingress.class</span><span class="token punctuation">:</span> <span class="token string">"nginx"</span><br><span class="token key atrule">spec</span><span class="token punctuation">:</span><br>  <span class="token key atrule">rules</span><span class="token punctuation">:</span><br>  <span class="token punctuation">-</span> <span class="token key atrule">host</span><span class="token punctuation">:</span> nginx<span class="token punctuation">-</span>deployment<span class="token punctuation">-</span>ingress.dev<br>    <span class="token key atrule">http</span><span class="token punctuation">:</span><br>      <span class="token key atrule">paths</span><span class="token punctuation">:</span><br>      <span class="token punctuation">-</span> <span class="token key atrule">path</span><span class="token punctuation">:</span> /<br>        <span class="token key atrule">backend</span><span class="token punctuation">:</span><br>          <span class="token key atrule">serviceName</span><span class="token punctuation">:</span> nginx<span class="token punctuation">-</span>deployment<br>          <span class="token key atrule">servicePort</span><span class="token punctuation">:</span> <span class="token number">80</span></code></pre>
+<p>Note how the ingress will connect to the service. I needed to create a host and add a backend, the Kubernetes service with its port.</p>
+<p>So now, if your DNS can translate <code>nginx-deployment-ingress.dev</code> to the IP of the NGINX proxy you will be able to connect to the service, pods and therefore to the containers we deployed as a dummy web app.</p>
+<p>PS: You can modify the contents of the two dummy web app pods to see actual load-balancing happening.</p>
+<hr>
+<p>References:</p>
+<ul>
+<li><a href="https://www.linode.com/docs/web-servers/nginx/use-nginx-reverse-proxy/">https://www.linode.com/docs/web-servers/nginx/use-nginx-reverse-proxy/</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/">https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">https://kubernetes.io/docs/concepts/services-networking/ingress/</a></li>
+<li><a href="https://kubernetes.github.io/ingress-nginx/">https://kubernetes.github.io/ingress-nginx/</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/service/#nodeport">https://kubernetes.io/docs/concepts/services-networking/service/#nodeport</a></li>
+</ul>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

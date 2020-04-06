@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Installing NodeJS on WSL</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Installing NodeJS on WSL</h2>
+
+    <div class="post-info">
+        2019-08-21
+    </div>
+
+    <div class="entry-content">
+        <p>After installing your WSL, if you want to install NodeJS on the Ubuntu 18.04 from Windows Store just run:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">curl</span> -sL https://deb.nodesource.com/setup_12.x <span class="token operator">|</span> <span class="token function">sudo</span> -E <span class="token function">bash</span> -</code></pre>
+<p>This will add the 12.x NodeJS repository to your system. Installing Node is a matter of:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> nodejs</code></pre>
+<p>That's it!</p>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>

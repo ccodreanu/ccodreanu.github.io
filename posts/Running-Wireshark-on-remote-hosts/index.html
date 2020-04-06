@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Running Wireshark on remote hosts through SSH</title>
+    <meta name="Description" content="Tech writings and thoughts.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/prism.css">
+    <link rel="stylesheet" href="/css/index.css">
+  </head>
+
+  <body id="index">
+    <section id="header">
+      <header id="banner">
+        <h1><a href="/">Catalin Codreanu</a></h1>
+      </header>
+    </section>
+    <section id="content">
+      <div id="post">
+    <h2 class="entry-title">Running Wireshark on remote hosts through SSH</h2>
+
+    <div class="post-info">
+        2019-02-28
+    </div>
+
+    <div class="entry-content">
+        <p>You might need to run Wireshark on remote hosts and that's usually a pain to deal with. What I prefer to do, in order to also have the traffic displayed on my machine in real time is to run <code>tcpdump</code> remotely and stream its output to <code>stdout</code> over SSH and finally pipe that to my local installation of Wireshark.</p>
+<p>Run this on your local machine:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">ssh</span> user@host <span class="token string">"/usr/sbin/tcpdump -s0 -w -"</span> <span class="token operator">|</span> wireshark -k -i -</code></pre>
+<p>When Wireshark starts on your machine, you should select the interface named <code>-</code> and you should be able to see the hosts traffic.</p>
+<p>Note that if you stop the capture, you'll have to restart the remote <code>tcpdump</code> process. That's pretty much it.</p>
+
+    </div>
+</div>
+
+    </section>
+  </body>
+</html>
