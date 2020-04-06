@@ -25,17 +25,18 @@
     <section id="header">
       <header id="banner">
         <h1><a href="/">Catalin Codreanu</a></h1>
+        <p>Mostly technical writings on code and machines</p>
       </header>
     </section>
     <section id="content">
       <div id="post">
-    <h2 class="entry-title">Watching for file changes with Python</h2>
+    <h2>Watching for file changes with Python</h2>
 
-    <div class="post-info">
+    <div id="post-info">
         2019-09-01
     </div>
 
-    <div class="entry-content">
+    <div id="post-content">
         <p>Working on <a href="https://github.com/picofish/generatore">Generatore</a> I wanted to be able to quickly rebuild the website when new changes were introduced to my posts.</p>
 <p>If you need to implement something like that, you need <a href="https://pythonhosted.org/watchdog/">Watchdog</a>.</p>
 <p>Quoting from my project, you'll need to implement a custom handler inheriting from <code>FileSystemEventHandler</code>:</p>

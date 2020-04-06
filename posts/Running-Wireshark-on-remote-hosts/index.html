@@ -25,17 +25,18 @@
     <section id="header">
       <header id="banner">
         <h1><a href="/">Catalin Codreanu</a></h1>
+        <p>Mostly technical writings on code and machines</p>
       </header>
     </section>
     <section id="content">
       <div id="post">
-    <h2 class="entry-title">Running Wireshark on remote hosts through SSH</h2>
+    <h2>Running Wireshark on remote hosts through SSH</h2>
 
-    <div class="post-info">
+    <div id="post-info">
         2019-02-28
     </div>
 
-    <div class="entry-content">
+    <div id="post-content">
         <p>You might need to run Wireshark on remote hosts and that's usually a pain to deal with. What I prefer to do, in order to also have the traffic displayed on my machine in real time is to run <code>tcpdump</code> remotely and stream its output to <code>stdout</code> over SSH and finally pipe that to my local installation of Wireshark.</p>
 <p>Run this on your local machine:</p>
 <pre class="language-shell"><code class="language-shell"><span class="token function">ssh</span> user@host <span class="token string">"/usr/sbin/tcpdump -s0 -w -"</span> <span class="token operator">|</span> wireshark -k -i -</code></pre>

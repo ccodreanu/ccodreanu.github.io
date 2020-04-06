@@ -2,6 +2,7 @@
   --link-color: rgb(0, 84, 180);
   --new-black-color: #111;
   --text-in-body: #333;
+  --very-light-grey: #aaa;
 }
 a,
 abbr,
@@ -127,23 +128,31 @@ a {
 pre {
   margin: 0;
 }
+/*
+**
+**
+**
+** END RESET 
+**
+**
+**
+*/
 #header {
   width: 40em;
   margin: 0 auto;
   padding-bottom: 4em;
-  height: 2em;
+  display: flex;
 }
 #banner {
-  width: 50%;
   float: left;
 }
 #banner a {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #111;
+  letter-spacing: -1px;
   text-decoration: none;
 }
 #menu {
-  width: 50%;
   float: right;
   text-align: right;
 }
@@ -154,55 +163,36 @@ pre {
   width: 40em;
   margin: 0 auto;
 }
-.post-info {
-  margin: 20px 0 40px 0;
-  color: #aaa;
-}
-.hentry .post-info {
-  margin: 0;
-  color: #aaa;
-}
-.entry-content {
-  line-height: 1.8;
-  color: var(--text-in-body);
-}
-.entry-content p {
-  margin-bottom: 1rem;
-}
-.entry-title {
+#post h2 {
   font-weight: 900;
   font-size: 3rem;
   color: #111;
   letter-spacing: -1px;
 }
-.index-entry-title {
-  display: inline;
+#post-info {
+  margin: 20px 0 40px 0;
+  color: var(--very-light-grey);
 }
-.index-entry-title > a {
-  font-weight: 400;
+#post-content {
+  line-height: 1.8;
+  color: var(--text-in-body);
 }
-.entry-content p > code {
+#post-content p {
+  margin-bottom: 1rem;
+}
+#post-content p > code {
   background: #f5f5dc;
   font-family: Consolas;
   font-size: 0.9em;
   padding: 5px;
 }
 #post-list li {
-  padding: 2em 0;
-  border-bottom: 1px dashed #eee;
+  padding: 1em 0;
+  display: flex;
 }
-#post-list li:first-child {
-  padding-top: 0;
-}
-.tags {
+#post-list li time {
   color: #aaa;
-  text-decoration: none;
-}
-#about {
-  text-align: center;
-  color: #aaa;
-  font-style: normal;
-  padding-top: 3em;
+  width: 5em;
 }
 @media (max-width: 50em) {
   #content,
